@@ -28,12 +28,12 @@ veg <- st_read("c:/data/Vegetation_Indigenous.shp")
 #-- We can have a more detailed look at the CRS
 st_crs(veg)
 
+#-- Q2: On which Longitude is the dataset centered? (hint: its "Longitude of natural origin")
+#-- [delete this line and write your answer here]
+
 #5
 #-- look at the data
 head(veg)
-
-#-- Q2: On which Longitude is the dataset centered? (hint: its "Longitude of natural origin")
-#-- [delete this line and write your answer here]
 
 #-- Q3: What class of data is veg? (hint: you'll use the class() function)
 ##- delete this line and write your answer here]
@@ -81,4 +81,39 @@ vegsub <- veg[which(veg$National_ %in% split_veg),]
 #Plot
 ggplot() + geom_sf(data=vegsub, aes(fill = `National_`))
 #-- Export the plot as an image and name it Rpolt02. Hand these in
+
+
+##-- NOW WE'LL CONTINUE WITH RASTERS
+
+#12
+#-- read and look at the dataset 
+dem  = read_stars("c:/data/CoCT_10m.tif")
+dem
+
+#-- Q5: What is the CRS of the raster dataset?
+#-- [delete this line and write your answer here]
+
+#-- Q6: What is the spatial resolution of the raster dataset?
+#-- [delete this line and write your answer here]
+
+#4
+#-- We can have a more detailed look at the CRS
+st_crs(dem)
+
+#-- Q7: On which Longitude is the dataset centered? (hint: its "Longitude of natural origin")
+#-- [delete this line and write your answer here]
+
+#5
+#-- We'll perform some basic raster cropping based on coordinates. Its very similar to the sf
+bbox <- st_bbox(c(xmin = -66642.18, xmax = -44412.18, ymin = -3809853.29, ymax = -3750723.29), crs = st_crs(dem))
+#-- Its very similar to the sf ~~ st_crop() from #9 above
+dem_trim <- st_crop(dem, bbox)
+
+plot(dem_trim, col="RdYlGn")
+
+demResample <- st_warp(dem_trim, cellsize = 30, use_gdal=TRUE, no_data_value=-9999)
+
+par(mfrow = c(1, 2), mar = rep(0.2, 4))
+image(x1[,,,1])
+image(x2[,,,1])
 
