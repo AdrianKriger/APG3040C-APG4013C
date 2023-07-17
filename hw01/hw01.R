@@ -82,6 +82,7 @@ vegsub <- veg[which(veg$National_ %in% split_veg),]
 ggplot() + geom_sf(data=vegsub, aes(fill = `National_`))
 #-- Export the plot as an image and name it Rpolt02. Hand these in
 
+## ------- ### NOT DONE FROM HERE
 
 ##-- NOW WE'LL CONTINUE WITH RASTERS
 
@@ -109,11 +110,15 @@ bbox <- st_bbox(c(xmin = -66642.18, xmax = -44412.18, ymin = -3809853.29, ymax =
 #-- Its very similar to the sf ~~ st_crop() from #9 above
 dem_trim <- st_crop(dem, bbox)
 
-plot(dem_trim, col="RdYlGn")
+
 
 demResample <- st_warp(dem_trim, cellsize = 30, use_gdal=TRUE, no_data_value=-9999)
 
-par(mfrow = c(1, 2), mar = rep(0.2, 4))
-image(x1[,,,1])
-image(x2[,,,1])
+demResample
+
+dem10 <- geom_stars(data = dem)
+
+dem30 <- geom_stars(data = demResample)
+
+plot(DEM, col = terrain.colors(99, alpha = NULL))
 
