@@ -65,7 +65,7 @@ veg <- st_crop(veg, ext)
 #10
 #-- lets create a fancy plot with ggplot (part of tidyverse) of our CROP.
 ggplot() + geom_sf(data=veg, aes(fill = `National_`))
-#-- Export the plot as an image and name it Rpolt01. Hand these in
+#-- Export the plot as an image and name it Rpolt02. Hand these in
 
 #11
 #-- we've CROPPED (cut with coordinates) the data now we subset the data.frame with the data we want. 
@@ -80,5 +80,5 @@ vegsub <- veg[which(veg$National_ %in% split_veg),]
 
 #Plot
 ggplot() + geom_sf(data=vegsub, aes(fill = `National_`))
-#-- Export the plot as an image and name it Rpolt01. Hand these in
+#-- Export the plot as an image and name it Rpolt02. Hand these in
 
