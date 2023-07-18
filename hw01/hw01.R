@@ -1,19 +1,28 @@
 ## APG3040C-APG4013C July-Sept 2023
 ## arkriger
 
-##-- create a /data/ folder on your C:/ and place the relevent files there. 
+##---------
+#-- student number: [write your student number here]
+#-- name:           [write your name.surname (exactly like that {name.surname}) here]
+#----------
+
+##-- create a your C:/data/ and place the relevant files there. 
 ##-- work through the script block-by-block. 
 ##-- i.e.: highlight #1. 
-##         Click Run. read the output. Answer the questions and follow the instructions; if any. Then #2. etc.
+##         Click Run. read the output. Answer the questions and follow the instructions; if any. 
+##--       then highlight #2. etc.
 
 #-- you might need to install these three very useful packages
 #1
-install.packages(c("sf", "stars", "tidyverse"))
+install.packages(c("sf", "tidyverse", "patchwork", "terra"))
 
 #2
 library(sf)
 library(tidyverse)
-library(stars)
+library(ggplot2)
+library(terra)
+library(patchwork)
+
 
 ##-- WE'LL START WITH VECTORS
 
@@ -82,13 +91,183 @@ vegsub <- veg[which(veg$National_ %in% split_veg),]
 ggplot() + geom_sf(data=vegsub, aes(fill = `National_`))
 #-- Export the plot as an image and name it Rpolt02. Hand these in
 
-## ------- ### NOT DONE FROM HERE
-
 ##-- NOW WE'LL CONTINUE WITH RASTERS
 
 #12
 #-- read and look at the dataset 
-dem  = read_stars("c:/data/CoCT_10m.tif")
+#dem  = read_stars("c:/data/CoCT_10m.tif")
+dem  = read_stars("c:/2023July-Sept/APG3040C_APG4013C-AdvancedSpatialAnalysis/assignments/hw01/data/CoCT_10m.tif")
+dem
+
+#-- Q5: What is the CRS of the raster dataset?
+#-- [delete this line and write your answer here]
+
+#-- Q6: What is the spatial resolution of the raster dataset?
+#-- [delete this line and write your answer here]
+
+#13
+#-- We can have a more detailed look at the CRS
+st_crs(dem)
+
+#-- Q7: On which Longitude is the dataset centered? (hint: its "Longitude of natural origin")
+#-- [delete this line and write your answer here]
+
+#14
+#-- We'll perform some basic raster cropping based on coordinates. 
+bbox <- st_bbox(c(xmin = -66642.18, xmax = -44412.18, ymin = -3809853.29, ymax = -3750723.29), crs = st_crs(dem))
+#-- Its very similar to the sf ~~ st_crop() from #9 above
+dem_trim <- st_crop(dem, bbox)
+dem_trim
+
+#15 
+#-- Although this might be almost unbelievable; there are times when working
+#-- with lower resolution data is better. At those times we often resample to a lower resolution. 
+dem_30 <- st_warp(dem_trim, cellsize = 30, use_gdal=TRUE, no_data_value=-9999)
+dem_30
+
+#16
+# Create the slope, aspect, and hillshade
+slope <- terrain(dem, "slope", unit="degrees", neighbors=8)
+plot(slope)
+
+#17
+# estimate the aspect or orientation
+aspect <- terrain(dem, "aspect", unit = "radians")
+plot(aspect)
+
+#18
+# calculate the hillshade effect with 45º of elevation
+hillshade <- shade(slope, aspect, angle = 45, direction = 315, normalize= TRUE)
+
+## ------- ### NOT DONE FROM HERE
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# calculate the hillshade effect with 45º of elevation
+#hillshade <- shade(slope, aspect, angle = 45, direction = 315, normalize= TRUE)
+
+# final hillshade 
+plot(hillshade, col = grey(1:100/100))
+
+hillshade %>%
+  as.data.frame(xy = TRUE) %>%
+  ggplot() +
+  geom_raster(aes(x = x, y = y, fill = hillshade)) + #note that the hillshade column name in this case is "hillshade"
+  scale_fill_gradient(low = "grey10", high = "grey90")
+
+
+# calculate the hillshade effect with 45º of elevation
+hillshade <- shade(slope, aspect, 
+                     angle = 45, 
+                     direction = 300,
+                     normalize= TRUE)
+
+# final hillshade 
+plot(hillshade, col = grey(1:100/100))
+
+
+
+
+
+
+
+
+
+# Plot the DEMs
+p1 <- ggplot(dem %>% as.data.frame(xy = TRUE)) +
+  geom_raster(aes(x = x, y = y, fill = `10m_BA`)) +
+  scale_fill_gradientn(colors = terrain.colors(100))
+p2 <- ggplot(dem30 %>% as.data.frame(xy = TRUE)) +
+  geom_raster(aes(x = x, y = y, fill = `10m_BA`)) +
+  scale_fill_gradientn(colors = terrain.colors(100))
+
+# Combine the plots side by side
+combined_plot <- p1 + p2 + plot_layout(ncol = 2, guides = "collect")
+
+# Display the combined plot
+combined_plot
+
+
+
+# Compute slope
+slope <- terrain(dem, "slope", unit = "radians")
+
+# Compute aspect
+aspect <- terrain(dem, "aspect", unit = "radians")
+
+# Compute hillshade
+hillshade <- shade(slope, aspect)
+
+plot(hillshade)
+
+hillshade %>%
+  as.data.frame(xy = TRUE) %>%
+  ggplot() +
+  geom_raster(aes(x = x, y = y, fill = hillshade)) + #note that the hillshade column name in this case is "hillshade"
+  scale_fill_gradient(low = "grey10", high = "grey90")
+
+
+# Create the slope, aspect, and hillshade
+slope <- terrain(dem30, slope, unit="degrees", neighbors=8)
+aspect <- terrain(dem30, aspect, unit="degrees", neighbors=8)
+hillshade <- hillShade(slope, aspect, 30)
+
+# Plot the slope, aspect, and hillshade side by side
+p1 <- ggplot(slope %>% as.data.frame(xy = TRUE)) +
+  geom_raster(aes(x = x, y = y, fill = slope)) +
+  scale_fill_gradientn(colors = terrain.colors(10))
+p2 <- ggplot(aspect %>% as.data.frame(xy = TRUE)) +
+  geom_raster(aes(x = x, y = y, fill = aspect)) +
+  scale_fill_gradientn(colors = terrain.colors(10))
+# p3 <- ggplot(hillshade %>% as.data.frame(xy = TRUE)) +
+#   geom_raster(aes(x = x, y = y, fill = hillshade)) +
+#   scale_fill_gradientn(colors = terrain.colors(10))
+p3 <- ggplot(hillshade %>% as.data.frame(xy = TRUE) +
+  geom_raster(aes(x = x, y = y, fill = hillshade)) + #note that the hillshade column name in this case is "hillshade"
+  scale_fill_gradient(low = "grey10", high = "grey90"))
+
+# Combine the plots side by side
+combined_plot <- p1 + p2 + p3 + plot_layout(ncol = 3, guides = "collect")
+
+# Display the combined plot
+combined_plot
+
+
+
+
+
+
+#12
+#-- read and look at the dataset 
+#dem  = read_stars("c:/data/CoCT_10m.tif")
+dem  = read_stars("c:/2023July-Sept/APG3040C_APG4013C-AdvancedSpatialAnalysis/assignments/hw01/data/CoCT_10m.tif")
 dem
 
 #-- Q5: What is the CRS of the raster dataset?
@@ -105,20 +284,70 @@ st_crs(dem)
 #-- [delete this line and write your answer here]
 
 #5
-#-- We'll perform some basic raster cropping based on coordinates. Its very similar to the sf
+#-- We'll perform some basic raster cropping based on coordinates. 
 bbox <- st_bbox(c(xmin = -66642.18, xmax = -44412.18, ymin = -3809853.29, ymax = -3750723.29), crs = st_crs(dem))
 #-- Its very similar to the sf ~~ st_crop() from #9 above
 dem_trim <- st_crop(dem, bbox)
+dem_trim
+
+# Resample to 30m
+#dem_30 <- resample(dem_trim, 30)
+dem_30 <- st_warp(dem_trim, cellsize = 30, use_gdal=TRUE, no_data_value=-9999)
+dem_30
 
 
+# Create the slope, aspect, and hillshade
+slope <- terrain(dem30, "slope", unit="degrees", neighbors=8)
+aspect <- terrain(dem30, "aspect", unit="degrees", neighbors=8)
+hillshade <- shade(slope, aspect, angle=45, direction = 315, normalize=TRUE)
 
-demResample <- st_warp(dem_trim, cellsize = 30, use_gdal=TRUE, no_data_value=-9999)
+# Plot the slope, aspect, and hillshade side by side
+p1 <- ggplot(slope %>% as.data.frame(xy = TRUE)) +
+  geom_raster(aes(x = x, y = y, fill = slope)) +
+  scale_fill_gradientn(colors = terrain.colors(10))
+p2 <- ggplot(aspect %>% as.data.frame(xy = TRUE)) +
+   geom_raster(aes(x = x, y = y, fill = aspect)) +
+   scale_fill_gradientn(colors = terrain.colors(10))
+# P3 <- ggplot(hillshade %>% as.data.frame(xy = TRUE)) +
+#    geom_raster(aes(x = x, y = y, fill = hillshade)) +
+#    scale_fill_gradientn(colors = terrain.colors(10))
 
-demResample
+P3 <- ggplot(hillshade %>% as.data.frame(xy = TRUE)) +
+  geom_raster(aes(x = x, y = y, fill = hillshade)) +
+  scale_fill_gradientn(colors = grey(1:100/100))
 
-dem10 <- geom_stars(data = dem)
+# Combine the plots side by side
+combined_plot <- p1 + p2 + p3 + plot_layout(ncol = 3, guides = "collect")
 
-dem30 <- geom_stars(data = demResample)
+# Display the combined plot
+combined_plot
 
-plot(DEM, col = terrain.colors(99, alpha = NULL))
+# convert the hillshade to xyz
+hilldf_single <- as.data.frame(dem30, xy = TRUE)
+
+dem30df <- as.data.frame(dem30, xy = TRUE)
+
+# map 
+ggplot() +
+  geom_raster(data = hilldf_single,
+              aes(x, y, fill = hillshade),
+              show.legend = FALSE) +
+  scale_fill_distiller(palette = "Greys") +
+  new_scale_fill() +
+  geom_raster(data = dem30df,
+              aes(x, y, fill = alt),
+              alpha = .7) +
+  scale_fill_hypso_tint_c(breaks = c(180, 250, 500, 1000,
+                                     1500,  2000, 2500,
+                                     3000, 3500, 4000)) +
+  # geom_sf(data = suiz_lakes,
+  #         fill = "#c6dbef", colour = NA) +
+  guides(fill = guide_colorsteps(barwidth = 20,
+                                 barheight = .5,
+                                 title.position = "right")) +
+  labs(fill = "m") +
+  coord_sf() +
+  theme_void() +
+  theme(legend.position = "bottom")
+
 
