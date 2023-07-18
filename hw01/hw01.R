@@ -21,7 +21,7 @@ library(sf)
 library(tidyverse)
 library(ggplot2)
 library(terra)
-library(patchwork)
+#library(patchwork)
 
 
 ##-- WE'LL START WITH VECTORS
@@ -89,14 +89,16 @@ vegsub <- veg[which(veg$National_ %in% split_veg),]
 
 #Plot
 ggplot() + geom_sf(data=vegsub, aes(fill = `National_`))
-#-- Export the plot as an image and name it Rpolt02. Hand these in
+#-- Export the plot as an image and name it Rpolt03. Hand these in
+
 
 ##-- NOW WE'LL CONTINUE WITH RASTERS
 
+
 #12
 #-- read and look at the dataset 
-#dem  = read_stars("c:/data/CoCT_10m.tif")
-dem  = read_stars("c:/2023July-Sept/APG3040C_APG4013C-AdvancedSpatialAnalysis/assignments/hw01/data/CoCT_10m.tif")
+dem  = rast("c:/data/CoCT_10m.tif")
+#dem  = read_stars("c:/2023July-Sept/APG3040C_APG4013C-AdvancedSpatialAnalysis/assignments/hw01/data/CoCT_10m.tif")
 dem
 
 #-- Q5: What is the CRS of the raster dataset?
@@ -107,37 +109,48 @@ dem
 
 #13
 #-- We can have a more detailed look at the CRS
-st_crs(dem)
+crs(dem)
 
 #-- Q7: On which Longitude is the dataset centered? (hint: its "Longitude of natural origin")
 #-- [delete this line and write your answer here]
 
 #14
-#-- We'll perform some basic raster cropping based on coordinates. 
-bbox <- st_bbox(c(xmin = -66642.18, xmax = -44412.18, ymin = -3809853.29, ymax = -3750723.29), crs = st_crs(dem))
-#-- Its very similar to the sf ~~ st_crop() from #9 above
-dem_trim <- st_crop(dem, bbox)
-dem_trim
+#-- We'll perform some basic raster cropping based on coordinates. Its very similar to the sf ~~ st_crop() from #9 above
+dem <- crop(dem, ext(c(-66642.18, -44412.18, -3809853.29, -3750723.29)))
+dem
 
 #15 
-#-- Although this might be almost unbelievable; there are times when working
+#-- Although this might sound almost unbelievable; there are times when working
 #-- with lower resolution data is better. At those times we often resample to a lower resolution. 
-dem_30 <- st_warp(dem_trim, cellsize = 30, use_gdal=TRUE, no_data_value=-9999)
-dem_30
+#dem_30 <- warp(dem_trim, cellsize = 30, use_gdal=TRUE, no_data_value=-9999)
+dem30 <- aggregate(dem, fact = 3)#, fun = mean)
+dem30 <- resample(dem, dem30, method='bilinear')
+dem30
+#plot(dem30, col = terrain.colors(50))
+
+#-- Q7: What is the spatial resolution of the elevation raster now?
+#-- [delete this line and write your answer here]
 
 #16
-# Create the slope, aspect, and hillshade
-slope <- terrain(dem, "slope", unit="degrees", neighbors=8)
-plot(slope)
+#-- Create the slope
+slope <- terrain(dem30, "slope", unit = "radians")
 
 #17
-# estimate the aspect or orientation
-aspect <- terrain(dem, "aspect", unit = "radians")
-plot(aspect)
+#-- estimate the aspect or orientation
+aspect <- terrain(dem30, "aspect", unit = "radians")
 
 #18
-# calculate the hillshade effect with 45º of elevation
-hillshade <- shade(slope, aspect, angle = 45, direction = 315, normalize= TRUE)
+#-- calculate the hillshade effect with 45º of elevation
+hillshade <- shade(slope, aspect, angle = 45, direction = 270, normalize= TRUE)
+
+#19
+#-- plot all together 
+par(mfrow=c(1,3))
+plot(slope, legend=FALSE)
+plot(aspect, legend=FALSE, yaxt = "n")
+plot(hillshade, col = grey(c(0:100)/100), legend = F, maxcell = Inf, smooth = FALSE,  yaxt = "n")
+#-- Export the plot as an image and name it Rpolt04. Hand these in
+
 
 ## ------- ### NOT DONE FROM HERE
 
@@ -158,6 +171,26 @@ hillshade <- shade(slope, aspect, angle = 45, direction = 315, normalize= TRUE)
 
 
 
+dem30df <- as.data.frame(dem30, xy = TRUE)
+names(dem30df)[3] <- "10m_BA "
+
+# map
+ggplot() +
+  geom_raster(data = dem30df,
+              aes(x, y, fill = alt)) +
+  # geom_sf(data = suiz_lakes,
+  #         fill = "#c6dbef", 
+  #         colour = NA) +
+  scale_fill_hypso_tint_c(breaks = c(180, 250, 500, 1000,
+                                     1500,  2000, 2500,
+                                     3000, 3500, 4000)) +
+  guides(fill = guide_colorsteps(barwidth = 20,
+                                 barheight = .5,
+                                 title.position = "right")) +
+  labs(fill = "m") +
+  #coord_sf() +
+  theme_void() +
+  theme(legend.position = "bottom")
 
 
 
@@ -251,7 +284,7 @@ p2 <- ggplot(aspect %>% as.data.frame(xy = TRUE)) +
 #   scale_fill_gradientn(colors = terrain.colors(10))
 p3 <- ggplot(hillshade %>% as.data.frame(xy = TRUE) +
   geom_raster(aes(x = x, y = y, fill = hillshade)) + #note that the hillshade column name in this case is "hillshade"
-  scale_fill_gradient(low = "grey10", high = "grey90"))
+  scale_fill_gradientn(low = "grey10", high = "grey90"))
 
 # Combine the plots side by side
 combined_plot <- p1 + p2 + p3 + plot_layout(ncol = 3, guides = "collect")
@@ -350,4 +383,34 @@ ggplot() +
   theme_void() +
   theme(legend.position = "bottom")
 
+
+
+## For better handling we set here the names
+names(dem) <- "alt"
+
+
+
+
+
+#16
+#-- Create the slope
+slope <- terrain(dem30, "slope", unit = "radians")
+plot(slope, legend=FALSE)
+
+#17
+#-- estimate the aspect or orientation
+aspect <- terrain(dem30, "aspect", unit = "radians")
+plot(aspect, legend=FALSE)
+
+#18
+#-- calculate the hillshade effect with 45º of elevation
+hillshade <- shade(slope, aspect, angle = 45, direction = 270, normalize= TRUE)
+#plot(hillshade, col = grey(c(0:100)/100), legend = F, maxcell = Inf, smooth = FALSE)
+
+#19
+#-- plot all together 
+par(mfrow=c(1,3))
+plot(slope, legend=FALSE)
+plot(aspect, legend=FALSE, yaxt = "n")
+plot(hillshade, col = grey(c(0:100)/100), legend = F, maxcell = Inf, smooth = FALSE,  yaxt = "n")
 
