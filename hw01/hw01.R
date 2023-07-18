@@ -6,7 +6,7 @@
 #-- name:           [write your name.surname (exactly like that {name.surname}) here]
 #----------
 
-##-- create a your C:/data/ and place the relevant files there. 
+##-- create a folder on your C:/data/ and place the relevant files there. 
 ##-- work through the script block-by-block. 
 ##-- i.e.: highlight #1. 
 ##         Click Run. read the output. Answer the questions and follow the instructions; if any. 
@@ -155,7 +155,12 @@ plot(hillshade, col = grey(c(0:100)/100), legend = F, maxcell = Inf, smooth = FA
 ## ------- ### NOT DONE FROM HERE
 
 
-
+pts_matrix = matrix(c(-253145, -6229725,
+                      -3266860, -3241958),
+                    ncol = 2, byrow = TRUE)
+line = st_sfc(st_linestring(pts_matrix), crs = 2180)
+line = st_line_sample(line, density = 1)
+line = st_cast(line, "POINT")
 
 
 
