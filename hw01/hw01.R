@@ -12,9 +12,9 @@
 ##         Click Run. read the output. Answer the questions and follow the instructions; if any. 
 ##--       then highlight #2. etc.
 
-#-- you might need to install these three very useful packages
+#-- you might need to install these very useful packages
 #1
-install.packages(c("sf", "tidyverse", "patchwork", "terra"))
+install.packages(c("sf", "tidyverse", "terra", "ggplot2"))
 
 #2
 library(sf)
