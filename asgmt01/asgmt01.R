@@ -31,7 +31,7 @@ setwd("C:/asgmt01/")
 
 #3
 #-- read the dataset
-veg <- st_read("Vegetation_Indigenous.shp")
+veg <- st_read("./data/Vegetation_Indigenous.shp")
 
 #-- Q1: What is the CRS of the vector dataset?
 #-- [delete this line and write your answer here]
@@ -100,7 +100,7 @@ ggplot() + geom_sf(data=vegsub, aes(fill = `National_`))
 
 #12
 #-- read and look at the dataset 
-dem  = rast("CoCT_10m.tif")
+dem  = rast("./data/CoCT_10m.tif")
 dem
 
 #-- Q5: What is the CRS of the raster dataset?
@@ -175,7 +175,6 @@ p3 <- aspect %>%
   scale_fill_gradient(low = "brown", high = "green") +
   theme(legend.position = "none") +
   labs(x = 'x' , y = 'y')
-
 
 # Combine plots
 plots <- hillshade_plot + slope_plot + aspect_plot + plot_layout(ncol = 3, guides = "collect")
