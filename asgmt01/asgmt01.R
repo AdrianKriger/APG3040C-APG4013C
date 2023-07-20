@@ -6,7 +6,7 @@
 #-- name:           [write your name.surname (exactly like that {name.surname}) here]
 #----------
 
-##-- create a folder on your C:/data/ and place the relevant files there. 
+##-- create a folder on your C:/asgmt01/ and place the relevant files there. 
 ##-- work through the script block-by-block. 
 ##-- i.e.: highlight #1. 
 ##         Click Run. read the output. Answer the questions and follow the instructions; if any. 
@@ -14,21 +14,24 @@
 
 #-- you might need to install these very useful packages
 #1
-install.packages(c("sf", "tidyverse", "terra", "ggplot2"))
+install.packages(c("sf", "tidyverse", "terra", "ggplot2", "patchwork"))
 
 #2
 library(sf)
 library(tidyverse)
 library(ggplot2)
+#library(tidyterra)
 library(terra)
-#library(patchwork)
+library(patchwork)
 
+#-- setting a working directory is always helpful
+setwd("C:/asgmt01/")
 
 ##-- WE'LL START WITH VECTORS
 
 #3
 #-- read the dataset
-veg <- st_read("c:/data/Vegetation_Indigenous.shp")
+veg <- st_read("Vegetation_Indigenous.shp")
 
 #-- Q1: What is the CRS of the vector dataset?
 #-- [delete this line and write your answer here]
@@ -97,8 +100,7 @@ ggplot() + geom_sf(data=vegsub, aes(fill = `National_`))
 
 #12
 #-- read and look at the dataset 
-dem  = rast("c:/data/CoCT_10m.tif")
-#dem  = read_stars("c:/2023July-Sept/APG3040C_APG4013C-AdvancedSpatialAnalysis/assignments/hw01/data/CoCT_10m.tif")
+dem  = rast("CoCT_10m.tif")
 dem
 
 #-- Q5: What is the CRS of the raster dataset?
@@ -110,6 +112,8 @@ dem
 #13
 #-- We can have a more detailed look at the CRS
 crs(dem)
+#-- or
+st_crs(dem)
 
 #-- Q7: On which Longitude is the dataset centered? (hint: its "Longitude of natural origin")
 #-- [delete this line and write your answer here]
@@ -145,277 +149,41 @@ hillshade <- shade(slope, aspect, angle = 45, direction = 270, normalize= TRUE)
 
 #19
 #-- plot all together 
-par(mfrow=c(1,3))
-plot(slope, legend=FALSE)
-plot(aspect, legend=FALSE, yaxt = "n")
-plot(hillshade, col = grey(c(0:100)/100), legend = F, maxcell = Inf, smooth = FALSE,  yaxt = "n")
-#-- Export the plot as an image and name it Rpolt04. Hand these in
-
-
-## ------- ### NOT DONE FROM HERE
-
-
-pts_matrix = matrix(c(-253145, -6229725,
-                      -3266860, -3241958),
-                    ncol = 2, byrow = TRUE)
-line = st_sfc(st_linestring(pts_matrix), crs = 2180)
-line = st_line_sample(line, density = 1)
-line = st_cast(line, "POINT")
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-dem30df <- as.data.frame(dem30, xy = TRUE)
-names(dem30df)[3] <- "10m_BA "
-
-# map
-ggplot() +
-  geom_raster(data = dem30df,
-              aes(x, y, fill = alt)) +
-  # geom_sf(data = suiz_lakes,
-  #         fill = "#c6dbef", 
-  #         colour = NA) +
-  scale_fill_hypso_tint_c(breaks = c(180, 250, 500, 1000,
-                                     1500,  2000, 2500,
-                                     3000, 3500, 4000)) +
-  guides(fill = guide_colorsteps(barwidth = 20,
-                                 barheight = .5,
-                                 title.position = "right")) +
-  labs(fill = "m") +
-  #coord_sf() +
-  theme_void() +
-  theme(legend.position = "bottom")
-
-
-
-
-
-
-
-
-
-
-
-
-# calculate the hillshade effect with 45º of elevation
-#hillshade <- shade(slope, aspect, angle = 45, direction = 315, normalize= TRUE)
-
-# final hillshade 
-plot(hillshade, col = grey(1:100/100))
-
-hillshade %>%
+# Plot hillshade
+p1 <- hillshade %>%
   as.data.frame(xy = TRUE) %>%
   ggplot() +
-  geom_raster(aes(x = x, y = y, fill = hillshade)) + #note that the hillshade column name in this case is "hillshade"
-  scale_fill_gradient(low = "grey10", high = "grey90")
-
-
-# calculate the hillshade effect with 45º of elevation
-hillshade <- shade(slope, aspect, 
-                     angle = 45, 
-                     direction = 300,
-                     normalize= TRUE)
-
-# final hillshade 
-plot(hillshade, col = grey(1:100/100))
-
-
-
-
-
-
-
-
-
-# Plot the DEMs
-p1 <- ggplot(dem %>% as.data.frame(xy = TRUE)) +
-  geom_raster(aes(x = x, y = y, fill = `10m_BA`)) +
-  scale_fill_gradientn(colors = terrain.colors(100))
-p2 <- ggplot(dem30 %>% as.data.frame(xy = TRUE)) +
-  geom_raster(aes(x = x, y = y, fill = `10m_BA`)) +
-  scale_fill_gradientn(colors = terrain.colors(100))
-
-# Combine the plots side by side
-combined_plot <- p1 + p2 + plot_layout(ncol = 2, guides = "collect")
-
-# Display the combined plot
-combined_plot
-
-
-
-# Compute slope
-slope <- terrain(dem, "slope", unit = "radians")
-
-# Compute aspect
-aspect <- terrain(dem, "aspect", unit = "radians")
-
-# Compute hillshade
-hillshade <- shade(slope, aspect)
-
-plot(hillshade)
-
-hillshade %>%
-  as.data.frame(xy = TRUE) %>%
-  ggplot() +
-  geom_raster(aes(x = x, y = y, fill = hillshade)) + #note that the hillshade column name in this case is "hillshade"
-  scale_fill_gradient(low = "grey10", high = "grey90")
-
-
-# Create the slope, aspect, and hillshade
-slope <- terrain(dem30, slope, unit="degrees", neighbors=8)
-aspect <- terrain(dem30, aspect, unit="degrees", neighbors=8)
-hillshade <- hillShade(slope, aspect, 30)
-
-# Plot the slope, aspect, and hillshade side by side
-p1 <- ggplot(slope %>% as.data.frame(xy = TRUE)) +
-  geom_raster(aes(x = x, y = y, fill = slope)) +
-  scale_fill_gradientn(colors = terrain.colors(10))
-p2 <- ggplot(aspect %>% as.data.frame(xy = TRUE)) +
-  geom_raster(aes(x = x, y = y, fill = aspect)) +
-  scale_fill_gradientn(colors = terrain.colors(10))
-# p3 <- ggplot(hillshade %>% as.data.frame(xy = TRUE)) +
-#   geom_raster(aes(x = x, y = y, fill = hillshade)) +
-#   scale_fill_gradientn(colors = terrain.colors(10))
-p3 <- ggplot(hillshade %>% as.data.frame(xy = TRUE) +
-  geom_raster(aes(x = x, y = y, fill = hillshade)) + #note that the hillshade column name in this case is "hillshade"
-  scale_fill_gradientn(low = "grey10", high = "grey90"))
-
-# Combine the plots side by side
-combined_plot <- p1 + p2 + p3 + plot_layout(ncol = 3, guides = "collect")
-
-# Display the combined plot
-combined_plot
-
-
-
-
-
-
-#12
-#-- read and look at the dataset 
-#dem  = read_stars("c:/data/CoCT_10m.tif")
-dem  = read_stars("c:/2023July-Sept/APG3040C_APG4013C-AdvancedSpatialAnalysis/assignments/hw01/data/CoCT_10m.tif")
-dem
-
-#-- Q5: What is the CRS of the raster dataset?
-#-- [delete this line and write your answer here]
-
-#-- Q6: What is the spatial resolution of the raster dataset?
-#-- [delete this line and write your answer here]
-
-#4
-#-- We can have a more detailed look at the CRS
-st_crs(dem)
-
-#-- Q7: On which Longitude is the dataset centered? (hint: its "Longitude of natural origin")
-#-- [delete this line and write your answer here]
-
-#5
-#-- We'll perform some basic raster cropping based on coordinates. 
-bbox <- st_bbox(c(xmin = -66642.18, xmax = -44412.18, ymin = -3809853.29, ymax = -3750723.29), crs = st_crs(dem))
-#-- Its very similar to the sf ~~ st_crop() from #9 above
-dem_trim <- st_crop(dem, bbox)
-dem_trim
-
-# Resample to 30m
-#dem_30 <- resample(dem_trim, 30)
-dem_30 <- st_warp(dem_trim, cellsize = 30, use_gdal=TRUE, no_data_value=-9999)
-dem_30
-
-
-# Create the slope, aspect, and hillshade
-slope <- terrain(dem30, "slope", unit="degrees", neighbors=8)
-aspect <- terrain(dem30, "aspect", unit="degrees", neighbors=8)
-hillshade <- shade(slope, aspect, angle=45, direction = 315, normalize=TRUE)
-
-# Plot the slope, aspect, and hillshade side by side
-p1 <- ggplot(slope %>% as.data.frame(xy = TRUE)) +
-  geom_raster(aes(x = x, y = y, fill = slope)) +
-  scale_fill_gradientn(colors = terrain.colors(10))
-p2 <- ggplot(aspect %>% as.data.frame(xy = TRUE)) +
-   geom_raster(aes(x = x, y = y, fill = aspect)) +
-   scale_fill_gradientn(colors = terrain.colors(10))
-# P3 <- ggplot(hillshade %>% as.data.frame(xy = TRUE)) +
-#    geom_raster(aes(x = x, y = y, fill = hillshade)) +
-#    scale_fill_gradientn(colors = terrain.colors(10))
-
-P3 <- ggplot(hillshade %>% as.data.frame(xy = TRUE)) +
   geom_raster(aes(x = x, y = y, fill = hillshade)) +
-  scale_fill_gradientn(colors = grey(1:100/100))
+  scale_fill_gradient(low = "grey10", high = "grey90") +
+  theme(legend.position = "none") +
+  labs(x = 'x' , y = 'y')
 
-# Combine the plots side by side
-combined_plot <- p1 + p2 + p3 + plot_layout(ncol = 3, guides = "collect")
+# Plot slope
+p2 <- slope %>%
+  as.data.frame(xy = TRUE) %>%
+  ggplot() +
+  geom_raster(aes(x = x, y = y, fill = slope)) +
+  scale_fill_gradient(low = "blue", high = "red") +
+  theme(legend.position = "none") +
+  labs(x = 'x' , y = 'y')
 
-# Display the combined plot
-combined_plot
-
-# convert the hillshade to xyz
-hilldf_single <- as.data.frame(dem30, xy = TRUE)
-
-dem30df <- as.data.frame(dem30, xy = TRUE)
-
-# map 
-ggplot() +
-  geom_raster(data = hilldf_single,
-              aes(x, y, fill = hillshade),
-              show.legend = FALSE) +
-  scale_fill_distiller(palette = "Greys") +
-  new_scale_fill() +
-  geom_raster(data = dem30df,
-              aes(x, y, fill = alt),
-              alpha = .7) +
-  scale_fill_hypso_tint_c(breaks = c(180, 250, 500, 1000,
-                                     1500,  2000, 2500,
-                                     3000, 3500, 4000)) +
-  # geom_sf(data = suiz_lakes,
-  #         fill = "#c6dbef", colour = NA) +
-  guides(fill = guide_colorsteps(barwidth = 20,
-                                 barheight = .5,
-                                 title.position = "right")) +
-  labs(fill = "m") +
-  coord_sf() +
-  theme_void() +
-  theme(legend.position = "bottom")
+# Plot aspect
+p3 <- aspect %>%
+  as.data.frame(xy = TRUE) %>%
+  ggplot() +
+  geom_raster(aes(x = x, y = y, fill = aspect)) +
+  scale_fill_gradient(low = "brown", high = "green") +
+  theme(legend.position = "none") +
+  labs(x = 'x' , y = 'y')
 
 
+# Combine plots
+plots <- hillshade_plot + slope_plot + aspect_plot + plot_layout(ncol = 3, guides = "collect")
 
-## For better handling we set here the names
-names(dem) <- "alt"
+# Plot with shared y-axis
+plots_shared_y <- plots + ylab('y')
 
-
-
-
-
-#16
-#-- Create the slope
-slope <- terrain(dem30, "slope", unit = "radians")
-plot(slope, legend=FALSE)
-
-#17
-#-- estimate the aspect or orientation
-aspect <- terrain(dem30, "aspect", unit = "radians")
-plot(aspect, legend=FALSE)
-
-#18
-#-- calculate the hillshade effect with 45º of elevation
-hillshade <- shade(slope, aspect, angle = 45, direction = 270, normalize= TRUE)
-#plot(hillshade, col = grey(c(0:100)/100), legend = F, maxcell = Inf, smooth = FALSE)
-
-#19
-#-- plot all together 
-par(mfrow=c(1,3))
-plot(slope, legend=FALSE)
-plot(aspect, legend=FALSE, yaxt = "n")
-plot(hillshade, col = grey(c(0:100)/100), legend = F, maxcell = Inf, smooth = FALSE,  yaxt = "n")
+# Print plot
+print(plots_shared_y)
+#-- Export the plot as an image and name it Rpolt04. Hand these in
 
