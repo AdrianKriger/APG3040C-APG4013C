@@ -6,6 +6,7 @@
 #-- name:           [write your name.surname (exactly like that {name.surname}) here]
 #----------
 
+install.packages(c("sf"))
 
 library(sp)
 data(meuse)
@@ -16,14 +17,13 @@ names(meuse)
 coordinates(meuse) = ~x+y
 class(meuse)
 
-attr(,"package")
+#attr("package")
 
 summary(meuse)
 
 coordinates(meuse)[1:5,]
 
-bubble(meuse, "zinc",
-+ col=c("#00ff0088", "#00ff0088"), main = "zinc concentrations (ppm)")
+bubble(meuse, "zinc", col=c("#00ff0088", "#00ff0088"), main = "zinc concentrations (ppm)")
 
 ##-- Spatial data on a regular grid
 data(meuse.grid)
@@ -34,12 +34,8 @@ class(meuse.grid)
 coordinates(meuse.grid) = ~x+y
 class(meuse.grid)
 
-attr(,"package")
-
 gridded(meuse.grid) = TRUE
 class(meuse.grid)
-
-attr(,"package")
 
 image(meuse.grid["dist"])
 title("distance to river (red = 0)")
@@ -49,7 +45,6 @@ zinc.idw = idw(zinc~1, meuse, meuse.grid)
 
 ##-- [inverse distance weighted interpolation]
 class(zinc.idw)
-attr(,"package")
 
 spplot(zinc.idw["var1.pred"], main = "zinc inverse distance weighted interpolations")
 
@@ -58,7 +53,6 @@ abline(lm(log(zinc)~sqrt(dist), meuse))
 
 
 ##-- Variograms
-
 lzn.vgm = variogram(log(zinc)~1, meuse)
 lzn.vgm
 
@@ -74,7 +68,6 @@ lznr.fit
 plot(lznr.vgm, lznr.fit)
 
 
-
 ##-- Kriging
 lzn.kriged = krige(log(zinc)~1, meuse, meuse.grid, model = lzn.fit)
 
@@ -88,16 +81,13 @@ lzn.condsim = krige(log(zinc)~1, meuse, meuse.grid, model = lzn.fit, nmax = 30, 
 #- [using conditional Gaussian simulation]
 spplot(lzn.condsim, main = "four conditional simulations")
 
-
 lzn.condsim2 = krige(log(zinc)~sqrt(dist), meuse, meuse.grid, model = lznr.fit, nmax = 30, nsim = 4)
 
 #- [using conditional Gaussian simulation]
 spplot(lzn.condsim2, main = "four UK conditional simulations")
 
 
-
 ##-- Directional variograms
-
 lzn.dir = variogram(log(zinc)~1, meuse, alpha = c(0, 45, 90, 135))
 lzndir.fit = vgm(.59, "Sph", 1200, .05, anis = c(45, .4))
 plot(lzn.dir, lzndir.fit, as.table = TRUE)
@@ -107,10 +97,8 @@ plot(lznr.dir, lznr.fit, as.table = TRUE)
 
 
 ##-- Variogram maps
-
 vgm.map = variogram(log(zinc)~sqrt(dist), meuse, cutoff = 1500, width = 100, map = TRUE)
 plot(vgm.map, threshold = 5)
-
 
 
 ##-- Cross variography
@@ -127,22 +115,3 @@ g.fit
 plot(v, g.fit)
 vgm.map = variogram(g, cutoff = 1500, width = 100, map = TRUE)
 plot(vgm.map, threshold = 5, col.regions = bpy.colors(), xlab = "", ylab = "")
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
