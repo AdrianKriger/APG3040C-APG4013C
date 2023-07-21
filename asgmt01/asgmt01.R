@@ -141,10 +141,10 @@ dem30
 # ---Q8: What is the spatial resolution of the elevation raster now?---
 # --[delete this line and write your answer here]
 
-#16
-# ---we'll use 'terra' for quickly visualizing slope, aspect and a hillshade
 
-# ---create the slope--------------------------------------------------
+# ---we'll use 'terra' to quickly visualise the slope, aspect and a hillshade
+
+#16 ---create the slope--------------------------------------------------
 slope <- terrain(dem30, "slope", unit = "radians")
 
 #17
