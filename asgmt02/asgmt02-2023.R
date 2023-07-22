@@ -6,7 +6,7 @@
 #-- name:           [write your name.surname (exactly like that {name.surname}) here]
 #----------
 
-install.packages(c("sf"))
+install.packages(c("sf", "gstat"))
 
 library(sp)
 library(gstat)
@@ -33,7 +33,7 @@ summary(meuse.grid)
 
 class(meuse.grid)
 
-coordinates(meuse.grid) = ~x+y
+cooinstall.packages(c("sp", "gstat", "lattice", "automap"))install.packages(c("sp", "gstat", "lattice", "automap"))install.packages(c("sp", "gstat", "lattice", "automap"))rdinates(meuse.grid) = ~x+y
 class(meuse.grid)
 
 gridded(meuse.grid) = TRUE
