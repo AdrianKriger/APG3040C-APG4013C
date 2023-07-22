@@ -9,6 +9,8 @@
 install.packages(c("sf"))
 
 library(sp)
+library(gstat)
+
 data(meuse)
 class(meuse)
 
@@ -39,7 +41,6 @@ class(meuse.grid)
 
 image(meuse.grid["dist"])
 title("distance to river (red = 0)")
-library(gstat)
 zinc.idw = idw(zinc~1, meuse, meuse.grid)
 
 
