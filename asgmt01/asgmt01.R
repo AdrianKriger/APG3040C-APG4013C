@@ -119,7 +119,11 @@ crs(dem)
 # ---or
 st_crs(dem)
 
-# ---Q7: On which Longitude is the dataset centered?----------------- 
+# ---Q7: What is the actual CRS of the raster dataset?----------------------
+# --[delete this line and write your answer here]
+
+
+# ---Q8: On which Longitude is the dataset centered?----------------- 
 #        (hint: its "Longitude of natural origin")
 # --[delete this line and write your answer here]
 
@@ -138,7 +142,7 @@ dem30 <- resample(dem, dem30, method='bilinear')
 dem30
 #plot(dem30, col = terrain.colors(50))
 
-# ---Q8: What is the spatial resolution of the elevation raster now?---
+# ---Q9: What is the spatial resolution of the elevation raster now?---
 # --[delete this line and write your answer here]
 
 
@@ -194,7 +198,7 @@ plots_shared_y <- plots + ylab('y')
 print(plots_shared_y)
 # --Export the plot as an image and name it Rpolt04. Hand these in
 
-# ---Q9: While a hillshade gives a very clear picture of the topography
+# ---Q10: While a hillshade gives a very clear picture of the topography
 #    Why would we want to know the slope and aspect? Who would use these datasets?
 # --[delete this line and write your answer here]
 
