@@ -12,7 +12,7 @@ The residuals from any of the above approaches may have spatial structure. This 
 
 1. The Ordinary Least Squares (OLS) fit may not be optimal, and a Generalized Least Squares (GLS) trend should be fit .
 2. The OLS or GLS trend surfaces can be modified by
-          (1) interpolating the residuals from the trend-surface fit and
+   (1) interpolating the residuals from the trend-surface fit and
    (2) adding these to the trend.
 4. The trend and local deviations can be modelled together with Universal Kriging (UK).
 
