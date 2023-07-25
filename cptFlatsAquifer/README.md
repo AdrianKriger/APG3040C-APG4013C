@@ -2,16 +2,15 @@
 
 A trend surface is a map of some continuous variable, computed as a function of the coördinates. This corresponds to the concept of a geographic trend, where the variable changes its value along a geographic gradient.
 
-The trend can be modelled as a linear trend, i.e., the variable increases or decreases a fixed amount for each unit change in the coördinates in
-some direction. This is called a first-order trend surface. 
+The trend can be modelled as a linear trend, i.e., the variable increases or decreases a fixed amount for each unit change in the coördinates in some direction. This is called a ***first-order trend surface***. 
 
-It can also be modelled as a polynomial trend, i.e., a linear model of some polynomials of the coördinates, for example, a quadratic, which is called asecond-order trend surface. 
+It can also be modelled as a polynomial trend, i.e., a linear model of some polynomials of the coördinates, for example, a quadratic, which is called a ***second-order trend surface***. 
 
-It can also be modelled as an empirical smooth function of the coördinates, for example a generalized additive model or a minimum-curvature surface (thin-plate spline).
+It can also be modelled as an ***empirical smooth function of the coördinates***, for example a generalized additive model or a minimum-curvature surface (thin-plate spline).
 
 The residuals from any of the above approaches may have spatial structure. This has two implications:
 
-1. The OLS fit may not be optimal, and a Generalized Least Squares (GLS) trend should be fit .
+1. The Ordinary Least Squares (OLS) fit may not be optimal, and a Generalized Least Squares (GLS) trend should be fit .
 2. The OLS or GLS trend surfaces can be modified by
           (1) interpolating the residuals from the trend-surface fit and
    (2) adding these to the trend.
