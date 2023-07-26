@@ -18,4 +18,4 @@ The residuals from any of the above approaches may have spatial structure. This 
 
 In this exercise we compare these approaches.
 
-We use a dataset that is well-suited to illustrate the concepts of trend surface: a set of observations of the elevation above mean sea level of the top of the Cape Town aquifer, South Africa measured at ~ 30 wells [harvested from Table Mountain groundwaterinfo](https://tablemountain.groundwaterinfo.africa/index.php/view/map/?repository=tmwsa&project=1_water_source_areas)
+We use a dataset that is well-suited to illustrate the concepts of trend surface: a set of observations of the elevation above mean sea level of the top of the Cape Flats aquifer, South Africa measured at ~ 30 wells [harvested from Table Mountain groundwaterinfo](https://tablemountain.groundwaterinfo.africa/index.php/view/map/?repository=tmwsa&project=1_water_source_areas)
