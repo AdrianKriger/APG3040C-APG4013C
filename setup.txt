@@ -1,0 +1,9 @@
+The easiest method to setup R (with all its necessary packages) in Jupyter is through both miniconda and Anaconda Navigator. 
+I experienced challenges accessing the necessary packages being exclusive. 
+
+1. get miniconda
+2. enter command `conda install anaconda-navigator`
+3. Launch Anaconda Navigator
+5. Follow the [instructions](https://docs.anaconda.com/free/navigator/tutorials/r-lang/) to prepare R in Jupyter [create environment, choose python and R version]. Stop at 9!
+6. activate the new environment in miniconda [`activate envName`] and `conda install -c conda-forge r-sf r-gstat r-ggplot2 r-gridextra r-terra r-mgcv r-fields r-nlme`
+7. Go back to Anaconda Navigator and continue from 9 (Open with Jupyter Notebook).
