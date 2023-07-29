@@ -4,7 +4,7 @@
 
 In this set of exercises, we will explore the concepts and applications of trend surface analysis, focusing on 1st and 2nd order trend surfaces, as well as empirical smooth functions. Additionally, we will delve into the various flavors of kriging, a powerful geostatistical interpolation method.
 
-The goal of Trend surface analysis is to help us identify and model the underlying trend or pattern in spatial data, while interpolation techniques enable us to estimate values at unsampled locations based on nearby data points. Through this hands-on exercise and a real-world example, you will gain a deeper understanding of spatial interpolation techniques and their applications in various fields, which includes geology, environmental studies, agriculture, urban planning, remote sensing, climate studies, geomorphology, archaelogy, health studies and seismology.
+The goal of Trend surface analysis is to **help us identify and model the underlying trend or pattern in spatial data, while interpolation techniques enable us to estimate values at unsampled locations based on nearby data points**. Through this hands-on exercise and a real-world example, you will gain a deeper understanding of spatial interpolation techniques and their applications in various fields, which includes geology, environmental studies, agriculture, urban planning, remote sensing, climate studies, geomorphology, archaelogy, health studies and seismology.
 
 We will start by understanding the principles of trend surface analysis, a technique used to model spatial trends and variations in data. You will learn how to fit **1st and 2nd order trend surfaces** to a dataset and interpret the results to identify underlying patterns.
 
