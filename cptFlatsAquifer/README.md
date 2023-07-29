@@ -1,6 +1,6 @@
-**Trend surfaces using R**
+# Trend surfaces using R
 
-# Welcome to this Trend Surface Analysis with R Tutorial! 
+**Welcome to this Trend Surface Analysis with R Tutorial!** 
 
 In this set of exercises, we will explore the concepts and applications of trend surface analysis, focusing on 1st and 2nd order trend surfaces, as well as empirical smooth functions. Additionally, we will delve into the various flavors of kriging, a powerful geostatistical interpolation method.
 
