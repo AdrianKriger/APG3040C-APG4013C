@@ -14,5 +14,5 @@ We end with Kriging flavors. Kriging is a geostatistical interpolation method th
 
 For these set of exersices we use a dataset that is well-suited to illustrate the concepts of trend surface: a set of observations of the elevation above mean sea level of the top of the Cape Flats aquifer, South Africa measured at ~ 30 wells [harvested from Table Mountain groundwaterinfo](https://tablemountain.groundwaterinfo.africa/index.php/view/map/?repository=tmwsa&project=1_water_source_areas). _NB: please take care with the application of this dataset. While the locations and dataset is real some of the values are for illustrative purposes only. A more authoritive dataset is required for a truly definitive result_.  
 
-These Notebooks are based on the work of [D.G. Rossiter](https://cals.cornell.edu/david-rossiter) and are subject to copywrite. _No sale or payment to access_
+These Notebooks are based on the work of [D.G. Rossiter](https://cals.cornell.edu/david-rossiter) and are subject to copywrite. _No sale nor payment to access_
 
