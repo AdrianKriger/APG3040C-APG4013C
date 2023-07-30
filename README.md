@@ -2,7 +2,10 @@
 
 Aims to introduce students to geostatistics, trend surface analysis, spatial interpolation, geostatistical models and generalised least squares, Kriging, and regression analysis.
 
-University of Cape Town,  
+Geomatics Division,
+School of Architecture, Planning and Geomatics,
 Engineering and the Built Environment,  
-School of Architecture, Planning and Geomatics,  
-Geomatics Division
+University of Cape Town.
+
+  
+
