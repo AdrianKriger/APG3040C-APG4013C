@@ -44,6 +44,10 @@ crs(columbus)
 #  projection <- "+proj=longlat +ellps=WGS84 +datum=WGS84" 
 # readshape <-readShapePoly("datashp.shp", proj4string=CRS(projection))
 
+##-- or try this
+data(columbus)
+columbus_sp <- SpatialPointsDataFrame(columbus, coords = c("X", "Y"), proj4string = CRS("+proj=longlat +datum=WGS84"))
+
 pacman::p_unload(graphics)
 ## The following packages are a base install and will not be unloaded:
 ## graphics
@@ -238,4 +242,66 @@ boxplot(d, xaxt="n",yaxt="n", pars=list(boxwex=0.3))
 
 boxplot(crime.gauss$columbus$SDF$INC)#, main = "Boxplot of Cadmium (ppm)")
 boxplot(log(crime.gauss$columbus$SDF$HOVAL))#, main = "Boxplot of Log-Cadmium (ppm)")
+
+ 
+ ###-- try this code snipet
+ # Load required library
+library(spgwr)
+
+# Load dataset
+data(columbus)
+
+# Perform GWR with Gauss
+columbus.bw <- gwr.sel(CRIME ~ INCOME + HOVAL, data = columbus, coords = cbind(columbusY))
+
+# Extract the betas for INCOME and HOVAL
+betas_df <- data.frame(INCOME = columbus.bw$SDF$INCOME, HOVAL = columbus.bw$SDF$HOVAL)
+
+# Load ggplot2 library
+library(ggplot2)
+
+# Create side-by-side box plots
+ggplot(melt(betas_df), aes(x = variable, y = value)) +
+  geom_boxplot() +
+  labs(title = "Distribution of INCOME and HOVAL Betas",
+       x = "Variable", y = "Beta Value")
+
+ ##-- or this with more modern libraries
+ # Install and load required packages
+install.packages("sf")
+install.packages("spdep") # for creating neighbors list, if not already installed
+install.packages("ggplot2")
+
+library(sf)
+library(spdep)
+library(ggplot2)
+
+# Load the data (assuming columbus data is in the correct format)
+data(columbus)
+
+# Convert the columbus data.frame to an sf object
+columbus_sf <- st_as_sf(columbus, coords = c("X", "Y"))
+
+# Generate neighborhood list for spatial weights
+nb <- poly2nb(columbus_sf)
+
+# GWR with Gauss
+columbus_gwr <- gwr.sel(CRIME ~ INCOME + HOVAL, data = columbus_sf, 
+                        kernel = "gaussian", adaptive = TRUE, gweight = nb)
+
+# Extract coefficients and create a data.frame
+gwr_coeffs <- as.data.frame(coef(columbus_gwr))
+
+# Create side-by-side box plots
+ggplot(gwr_coeffs, aes(x = factor(Variable), y = Estimate)) +
+  geom_boxplot() +
+  labs(x = "Variables", y = "Coefficients") +
+  ggtitle("Distribution of INCOME and HOVAL Betas") +
+  theme_minimal()
+
+
+
+
+
+
 
