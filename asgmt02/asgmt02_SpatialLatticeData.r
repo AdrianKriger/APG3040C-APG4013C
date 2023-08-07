@@ -21,10 +21,12 @@ library(PerformanceAnalytics)
 ##############
 # Several packages to do this
 # rgdal::readOGR
-# maptools::readShapePoly
+#maptools::readShapePoly
 
 # Read data into R
-columbus <- readShapePoly(system.file("etc/shapes/columbus.shp", package="spdep")[1])
+#columbus <- readShapePoly(system.file("etc/shapes/columbus.shp", package="spdep")[1])
+columbus <- readOGR(system.file("etc/shapes/columbus.shp", package="spdep")[1])
+
 
 class(columbus) # Class of object
 ## [1] "SpatialPolygonsDataFrame"
@@ -33,6 +35,7 @@ class(columbus) # Class of object
 slotNames(columbus) # Check the Components of the SpatialPolygonsDataFrame
 ## [1] "data"        "polygons"    "plotOrder"   "bbox"        "proj4string"
 # str(columbus)  # Full structure of the object 
+crs(columbus)
 
 # Change map projection if necessary
 # readshape <- spTransform(readshape, CRS("+init=epsg:2154"))
@@ -55,6 +58,10 @@ names(columbusdata) # Names of variables
 ## [11] "PLUMB"      "DISCBD"     "X"          "Y"          "NSA"       
 ## [16] "NSB"        "EW"         "CP"         "THOUS"      "NEIGNO"
 str(columbusdata)   # Structure of the object (gives you details of variable types)
+
+#- subset
+columbusdata_sub <- columbusdata[,c(7, 8, 9, 10, 11, 12)]
+head(columbusdata_sub, 3)
 
 # Spatial Heterogeneity
 cor(columbusdata_sub) # Correlation 
@@ -87,9 +94,9 @@ brks.jk = classIntervals(columbus$CRIME, n = 7, style = "jenks")
 
 # Link the color pallette to the class breaks (categories) using
 # findColours(CATEGORIES,PALETTE)
-brks.eqcol = findColours(brks.eq,pal)
-brks.qtcol = findColours(brks.qt,pal)
-brks.jkcol = findColours(brks.jk,pal)
+brks.eqcol = findColours(brks.eq, pal)
+brks.qtcol = findColours(brks.qt, pal)
+brks.jkcol = findColours(brks.jk, pal)
 
 # Plot with Equal Breaks
 plot(columbus,  col=brks.qtcol, border="black")
@@ -156,7 +163,6 @@ CRIME <- scale(columbus$CRIME)
 columbus$lag_sCRIME <- lag.listw(columbus.wts, CRIME)
 
 
-
 # Identify the Moran plot quadrant for each observation
 columbus$quad_sig <- NA 
 columbus[(columbus$CRIME >= 0 & columbus$lag_sCRIME >= 0) & (columbus_locm[, 5] <= 0.05), 
@@ -183,43 +189,51 @@ legend("topleft", legend = labels, fill = colors, bty = "n",cex = 0.7)
 reg1 <- lm( columbusdata$CRIME ~ columbusdata$INC + columbusdata$HOVAL )
 
 # Moran's I on the residuals 
-
 moran.test(reg1$residuals, columbus.wts, alternative="two.sided")
+
 # Plot the residuals
 res <- residuals(reg1)
 classes_sd <- classIntervals(res, n=4, style = "sd", rtimes = 1, dataPrecision = 3)
 res.palette <- colorRampPalette(c("blue","white","red"), space = "rgb")
 pal <- res.palette(4)
-cols <- findColours(classes_sd,pal)
-par(mar=rep(0,4))
+cols <- findColours(classes_sd, pal)
+par(mar=rep(0, 4))
 plot(columbus,col=cols, main="Residuals from OLS Model", border="grey")
 legend("bottomright",cex=0.7,fill=attr(cols,"palette"),bty="n",
-       legend=names(attr(cols, "table")),title="Residuals from OLS Model",ncol=4)
+       legend=names(attr(cols, "table")),title="Residuals from OLS Model", ncol=4)
 
 library(spgwr)
 data(columbus)
 names(columbus)
 ## [1] "crime"   "income"  "housing" "x"       "y"
 # GWR with Gauss
-crime.bw <- gwr.sel(crime ~ income + housing, 
-                  data=columbus,
-                  coords=cbind(columbus$x, columbus$y))
+crime.bw <- gwr.sel(columbus$CRIME ~ columbus$INC + columbus$HOVAL, 
+                    data=columbus,
+                    coords=cbind(columbus$X, columbus$Y))
 
-Next fit a geographic regression. This is done with the gwr() function.
+#Next fit a geographic regression. This is done with the gwr() function.
 # Brackets around the code prints the results
-(crime.gauss <- gwr(crime ~ income + housing, 
-                  data=columbus,
-                  coords=cbind(columbus$x, columbus$y),
-                  bandwidth=crime.bw))
-
+(crime.gauss <- gwr(columbus$CRIME ~ columbus$INC + columbus$HOVAL,
+                    data=columbus,
+                    coords=cbind(columbus$X, columbus$Y),
+                    bandwidth=crime.bw, hatmatrix=TRUE)
+  
+crime.gauss$SDF$columbus.INC
+  
 #Paste your results on your report.
 # Distribution of betas
+#d <- cbind(crime.gauss$SDF$INC, crime.gauss$SDF$HOVAL)
+d <- cbind(crime.gauss$columbus.INC, crime.gauss$columbus.HOVAL)
 
-d <- cbind(crime.gauss$SDF$income,crime.gauss$SDF$housing)
 
 par(mar=c(3,4,2,2))
-boxplot(d,xaxt="n",yaxt="n",pars=list(boxwex=0.3))
-axis(1,at=1:2,label=c("Income","Housing"))
-axis(2,at=seq(-4,2,.2),las=1)
-abline(h=0,lty="4343",col="#7E7E7E")
-mtext("Beta i",2,line=3)
+boxplot(d, xaxt="n",yaxt="n", pars=list(boxwex=0.3))
+#axis(1, at=1:2,label=c("Income", "Housing"))
+#axis(2, at=seq(-4,2,.2),las=1)
+#ylim = c(0,300)
+#abline(h=0,lty="4343",col="#7E7E7E")
+#mtext("Beta i",2,line=3)
+
+boxplot(crime.gauss$columbus$SDF$INC)#, main = "Boxplot of Cadmium (ppm)")
+boxplot(log(crime.gauss$columbus$SDF$HOVAL))#, main = "Boxplot of Log-Cadmium (ppm)")
+
