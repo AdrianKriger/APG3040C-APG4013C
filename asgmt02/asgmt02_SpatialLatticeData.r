@@ -202,6 +202,8 @@ plot(columbus,col=cols, main="Residuals from OLS Model", border="grey")
 legend("bottomright",cex=0.7,fill=attr(cols,"palette"),bty="n",
        legend=names(attr(cols, "table")),title="Residuals from OLS Model", ncol=4)
 
+##-- stop here
+
 library(spgwr)
 data(columbus)
 names(columbus)
