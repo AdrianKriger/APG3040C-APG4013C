@@ -3,7 +3,7 @@ getwd()
 #setwd("~/student")
 
 # Example of how to install a package:
-# install.packages("rgdal")
+install.packages("RColorBrewer", "rgdal", "sp", "maptools", "spdep", "PerformanceAnalytics")
 options(scipen = 999) # turn off scientific notation (so p-values are readable)
 options(digits = 4) 
 
@@ -29,24 +29,18 @@ columbus <- readOGR(system.file("etc/shapes/columbus.shp", package="spdep")[1])
 
 
 class(columbus) # Class of object
-## [1] "SpatialPolygonsDataFrame"
-## attr(,"package")
-## [1] "sp"
-slotNames(columbus) # Check the Components of the SpatialPolygonsDataFrame
-## [1] "data"        "polygons"    "plotOrder"   "bbox"        "proj4string"
-# str(columbus)  # Full structure of the object 
-crs(columbus)
 
-# Change map projection if necessary
+slotNames(columbus) # Check the Components of the SpatialPolygonsDataFrame
+
+#crs(columbus)
+
+##-- Change map projection if necessary
 # readshape <- spTransform(readshape, CRS("+init=epsg:2154"))
 
 # Example of reading shapefile and setting projection if working with your own data
 #  projection <- "+proj=longlat +ellps=WGS84 +datum=WGS84" 
 # readshape <-readShapePoly("datashp.shp", proj4string=CRS(projection))
-
-##-- or try this
-data(columbus)
-columbus_sp <- SpatialPointsDataFrame(columbus, coords = c("X", "Y"), proj4string = CRS("+proj=longlat +datum=WGS84"))
+#--
 
 pacman::p_unload(graphics)
 ## The following packages are a base install and will not be unloaded:
@@ -138,17 +132,8 @@ plot(columbus.wts, columbuscoords, pch=19, cex=0.6, add=TRUE)
 moran(columbus$CRIME, columbus.wts, n = m, S0 = s)
 
 moran.test(columbus$CRIME, columbus.wts)
-## 
-##  Moran I test under randomisation
-## 
-## data:  columbus$CRIME  
-## weights: columbus.wts  
-## 
-## Moran I statistic standard deviate = 5.6, p-value = 0.00000001
-## alternative hypothesis: greater
-## sample estimates:
-## Moran I statistic       Expectation          Variance 
-##          0.500189         -0.020833          0.008689
+
+
 # Moran Scatterplot
 columbusmp <- moran.plot(columbus$CRIME, columbus.wts, 
                          labels = as.character(columbus.wts$POLYID), 
@@ -206,102 +191,32 @@ plot(columbus,col=cols, main="Residuals from OLS Model", border="grey")
 legend("bottomright",cex=0.7,fill=attr(cols,"palette"),bty="n",
        legend=names(attr(cols, "table")),title="Residuals from OLS Model", ncol=4)
 
-##-- stop here
-
 library(spgwr)
 data(columbus)
 names(columbus)
-## [1] "crime"   "income"  "housing" "x"       "y"
-# GWR with Gauss
+
 crime.bw <- gwr.sel(columbus$CRIME ~ columbus$INC + columbus$HOVAL, 
                     data=columbus,
                     coords=cbind(columbus$X, columbus$Y))
 
-#Next fit a geographic regression. This is done with the gwr() function.
-# Brackets around the code prints the results
-(crime.gauss <- gwr(columbus$CRIME ~ columbus$INC + columbus$HOVAL,
+#-- Next fit a geographic regression. This is done with the gwr() function.
+#-- Brackets around the code prints the results
+crime.gauss <- gwr(CRIME ~ INC + HOVAL,
                     data=columbus,
                     coords=cbind(columbus$X, columbus$Y),
                     bandwidth=crime.bw, hatmatrix=TRUE)
   
-crime.gauss$SDF$columbus.INC
-  
+
 #Paste your results on your report.
 # Distribution of betas
-#d <- cbind(crime.gauss$SDF$INC, crime.gauss$SDF$HOVAL)
-d <- cbind(crime.gauss$columbus.INC, crime.gauss$columbus.HOVAL)
+d <- cbind(crime.gauss$SDF$INC, crime.gauss$SDF$HOVAL)
+d
 
-
+#-- plot
 par(mar=c(3,4,2,2))
 boxplot(d, xaxt="n",yaxt="n", pars=list(boxwex=0.3))
-#axis(1, at=1:2,label=c("Income", "Housing"))
-#axis(2, at=seq(-4,2,.2),las=1)
+axis(1, at=1:2,label=c("Income", "Housing"))
+axis(2, at=seq(-4,2,.2),las=1)
 #ylim = c(0,300)
-#abline(h=0,lty="4343",col="#7E7E7E")
-#mtext("Beta i",2,line=3)
-
-boxplot(crime.gauss$columbus$SDF$INC)#, main = "Boxplot of Cadmium (ppm)")
-boxplot(log(crime.gauss$columbus$SDF$HOVAL))#, main = "Boxplot of Log-Cadmium (ppm)")
-
- 
- ###-- try this code snipet
- # Load required library
-library(spgwr)
-
-# Load dataset
-data(columbus)
-
-# Perform GWR with Gauss
-columbus.bw <- gwr.sel(CRIME ~ INCOME + HOVAL, data = columbus, coords = cbind(columbusY))
-
-# Extract the betas for INCOME and HOVAL
-betas_df <- data.frame(INCOME = columbus.bw$SDF$INCOME, HOVAL = columbus.bw$SDF$HOVAL)
-
-# Load ggplot2 library
-library(ggplot2)
-
-# Create side-by-side box plots
-ggplot(melt(betas_df), aes(x = variable, y = value)) +
-  geom_boxplot() +
-  labs(title = "Distribution of INCOME and HOVAL Betas",
-       x = "Variable", y = "Beta Value")
-
- ##-- or this with more modern libraries
- # Install and load required packages
-install.packages("sf")
-install.packages("spdep") # for creating neighbors list, if not already installed
-install.packages("ggplot2")
-
-library(sf)
-library(spdep)
-library(ggplot2)
-
-# Load the data (assuming columbus data is in the correct format)
-data(columbus)
-
-# Convert the columbus data.frame to an sf object
-columbus_sf <- st_as_sf(columbus, coords = c("X", "Y"))
-
-# Generate neighborhood list for spatial weights
-nb <- poly2nb(columbus_sf)
-
-# GWR with Gauss
-columbus_gwr <- gwr.sel(CRIME ~ INCOME + HOVAL, data = columbus_sf, 
-                        kernel = "gaussian", adaptive = TRUE, gweight = nb)
-
-# Extract coefficients and create a data.frame
-gwr_coeffs <- as.data.frame(coef(columbus_gwr))
-
-# Create side-by-side box plots
-ggplot(gwr_coeffs, aes(x = factor(Variable), y = Estimate)) +
-  geom_boxplot() +
-  labs(x = "Variables", y = "Coefficients") +
-  ggtitle("Distribution of INCOME and HOVAL Betas") +
-  theme_minimal()
-
-
-
-
-
-
-
+abline(h=0,lty="4343",col="#7E7E7E")
+mtext("Beta i",2,line=3)
