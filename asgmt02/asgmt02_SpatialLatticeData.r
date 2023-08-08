@@ -51,10 +51,7 @@ columbusdata <- columbus@data
 class(columbusdata) # Class of object
 ## [1] "data.frame"
 names(columbusdata) # Names of variables
-##  [1] "AREA"       "PERIMETER"  "COLUMBUS_"  "COLUMBUS_I" "POLYID"    
-##  [6] "NEIG"       "HOVAL"      "INC"        "CRIME"      "OPEN"      
-## [11] "PLUMB"      "DISCBD"     "X"          "Y"          "NSA"       
-## [16] "NSB"        "EW"         "CP"         "THOUS"      "NEIGNO"
+
 str(columbusdata)   # Structure of the object (gives you details of variable types)
 
 #- subset
@@ -63,11 +60,11 @@ head(columbusdata_sub, 3)
 
 # Spatial Heterogeneity
 cor(columbusdata_sub) # Correlation 
+
 # Correlation plot using PerformanceAnalytic package
 chart.Correlation(columbusdata_sub, histogram=TRUE, pch=19)
 
 # Plot the zones from the Columbus, Ohio data
-
 plot(columbus,col='wheat') # Create a plot of columbus
 # Add labels for each of the zones
 text(coordinates(columbus),
@@ -133,7 +130,6 @@ moran(columbus$CRIME, columbus.wts, n = m, S0 = s)
 
 moran.test(columbus$CRIME, columbus.wts)
 
-
 # Moran Scatterplot
 columbusmp <- moran.plot(columbus$CRIME, columbus.wts, 
                          labels = as.character(columbus.wts$POLYID), 
@@ -145,7 +141,6 @@ columbus_cor5
 plot(columbus_cor5, main = "Correlelogram of CRIME")
 
 ### Local Moran's I
-
 columbus_locm <- localmoran(columbus$CRIME, columbus.wts)
 
 CRIME <- scale(columbus$CRIME)
@@ -191,6 +186,7 @@ plot(columbus,col=cols, main="Residuals from OLS Model", border="grey")
 legend("bottomright",cex=0.7,fill=attr(cols,"palette"),bty="n",
        legend=names(attr(cols, "table")),title="Residuals from OLS Model", ncol=4)
 
+##- geographical weighted regression
 library(spgwr)
 data(columbus)
 names(columbus)
@@ -206,8 +202,8 @@ crime.gauss <- gwr(CRIME ~ INC + HOVAL,
                     coords=cbind(columbus$X, columbus$Y),
                     bandwidth=crime.bw, hatmatrix=TRUE)
   
-
 #Paste your results on your report.
+
 # Distribution of betas
 d <- cbind(crime.gauss$SDF$INC, crime.gauss$SDF$HOVAL)
 d
