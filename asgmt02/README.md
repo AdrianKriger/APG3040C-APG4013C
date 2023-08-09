@@ -9,3 +9,5 @@ These interpolation methods [Trend surface analysis] include:
 3) both Special and Ordinary Kriging.
 
 asgmt02 tests cadmium and asgmt02-2023 tests zinc
+
+LatticeData ~ explore the [columbus crime dataset](https://search.r-project.org/CRAN/refmans/gwrr/html/columbus.html): correlation, MORAN's, spatial autocorrelation, correlograms and geographical weighted regression.
