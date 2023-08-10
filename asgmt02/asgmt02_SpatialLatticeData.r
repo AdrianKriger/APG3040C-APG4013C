@@ -3,7 +3,12 @@ getwd()
 #setwd("~/student")
 
 # Example of how to install a package:
-install.packages("RColorBrewer", "rgdal", "sp", "maptools", "spdep", "PerformanceAnalytics")
+install.packages("RColorBrewer")
+install.packages("rgdal")
+install.packages("maptools")
+install.packages("spdep")
+install.packages("PerformanceAnalytics")
+
 options(scipen = 999) # turn off scientific notation (so p-values are readable)
 options(digits = 4) 
 
@@ -27,7 +32,6 @@ library(PerformanceAnalytics)
 #columbus <- readShapePoly(system.file("etc/shapes/columbus.shp", package="spdep")[1])
 columbus <- readOGR(system.file("etc/shapes/columbus.shp", package="spdep")[1])
 
-
 class(columbus) # Class of object
 
 slotNames(columbus) # Check the Components of the SpatialPolygonsDataFrame
@@ -49,7 +53,7 @@ pacman::p_unload(graphics)
 columbusdata <- columbus@data
 
 class(columbusdata) # Class of object
-## [1] "data.frame"
+
 names(columbusdata) # Names of variables
 
 str(columbusdata)   # Structure of the object (gives you details of variable types)
@@ -201,7 +205,8 @@ crime.gauss <- gwr(CRIME ~ INC + HOVAL,
                     data=columbus,
                     coords=cbind(columbus$X, columbus$Y),
                     bandwidth=crime.bw, hatmatrix=TRUE)
-  
+
+summary(crime.gauss$results)
 #Paste your results on your report.
 
 # Distribution of betas
@@ -216,3 +221,53 @@ axis(2, at=seq(-4,2,.2),las=1)
 #ylim = c(0,300)
 abline(h=0,lty="4343",col="#7E7E7E")
 mtext("Beta i",2,line=3)
+
+# Create a traditional regression model for comparison
+crime.lm <- lm(CRIME ~ INC + HOVAL, data=columbus)
+
+summary(crime.lm)
+
+# Set up the layout for the combined plot
+par(mfrow=c(1, 2)) # 1 row, 2 columns
+# Create the first scatter plot: GWR predictions vs. True values
+plot(columbus$CRIME, crime.gauss$fitted.values, 
+     xlab="Observed Crime Rate", ylab="Predicted Crime Rate (GWR)",
+     main="GWR vs. True Values")
+abline(0, 1, col="red")
+
+# Create the second scatter plot: Traditional regression predictions vs. True values
+plot(columbus$CRIME, predict(crime.lm), 
+     xlab="Observed Crime Rate", ylab="Predicted Crime Rate (Traditional Regression)",
+     main="Traditional Regression vs. True Values")
+abline(0, 1, col="blue")
+# Reset the layout
+par(mfrow=c(1, 1)) # Reset to default layout
+
+
+
+# 
+# #-- perhaps you might want to update with spatialreg
+# library(spatialreg)
+# data(columbus)
+# 
+# crime.bw <- bw.reg(columbus$CRIME ~ columbus$INC + columbus$HOVAL, 
+#                    data=columbus,
+#                    coords=cbind(columbus$X, columbus$Y),
+#                    method="cv")
+# 
+# crime.gwr <- GWR(CRIME ~ INC + HOVAL,
+#                  data=columbus,
+#                  coords=cbind(columbus$X, columbus$Y),
+#                  bandwidth=crime.bw)
+# 
+# # Distribution of betas
+# d <- cbind(crime.gwr$SDF$INC, crime.gwr$SDF$HOVAL)
+# d
+# 
+# # Plot
+# par(mar=c(3,4,2,2))
+# boxplot(d, xaxt="n", yaxt="n", pars=list(boxwex=0.3))
+# axis(1, at=1:2, label=c("Income", "Housing"))
+# axis(2, at=seq(-4, 2, 0.2), las=1)
+# abline(h=0, lty="4343", col="#7E7E7E")
+# mtext("Beta i", 2, line=3)
