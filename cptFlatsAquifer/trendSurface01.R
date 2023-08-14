@@ -3,13 +3,10 @@
 
 install.packages("sf")
 install.packages("gstat")
-install.packages("units")
-install.packages("terra")
+install.packages("stars")
 
 library(sf)                # 'simple features' representations of spatial objects
 library(gstat)             # geostatistics
-library(gridExtra)         # arrange multiple ggplot graphics on one figure
-library(units)             # units of measure
 library(stars) 
 
 options(show.signif.stars=FALSE)
@@ -66,7 +63,7 @@ plot(#st_coordinates(cfaq.sf)[,2] ~ st_coordinates(cfaq.sf)[,1],
   pch=21,
   xlab="UTM19_E", ylab="UTM19_N",
   bg=sp::bpy.colors(length(cfaq$waterLevel))[rank(cfaq$waterLevel)],
-  cex=0.8*cfaq$waterLevel/max(cfaq$waterLevel), asp=1)
+  cex=0.8)#*cfaq$waterLevel/max(cfaq$waterLevel), asp=1)
 grid()
 title("Elevation of aquifer, m")
 
@@ -111,8 +108,8 @@ num_plots <- length(idp_values)
 # Arrange plots in 2 rows and 2 columns
 par(mfrow = c(2, 2))  
 # Set the size of the individual plots
-plot_width <- 9
-plot_height <- 9
+plot_width <- 8
+plot_height <- 8
 
 # Set the margin and space between plots
 margin_size <- 0.5
@@ -121,6 +118,12 @@ space_between_plots <- 0.3
 # Calculate the total plot area
 total_width <- plot_width * 2 + space_between_plots
 total_height <- plot_height * 2 + space_between_plots
+
+min.x <- floor(min(cfaq.sf$X)/1000)*1000
+max.x <- ceiling(max(cfaq.sf$X)/1000)*1000
+
+min.y <- floor(min(cfaq.sf$Y)/1000)*1000
+max.y <- ceiling(max(cfaq.sf$Y)/1000)*1000
 
 # Set par settings for plot layout
 par(mfrow = c(2, 2), mar = c(0.6, 0.6, 0.8, 0.1),#margin_size, margin_size, margin_size, margin_size),
