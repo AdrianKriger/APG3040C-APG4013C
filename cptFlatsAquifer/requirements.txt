@@ -1,0 +1,11 @@
+conda install -c conda-forge 
+
+r-sf==0.9_1
+r-gstat 
+r-stars
+r-ggplot2 
+r-gridextra 
+r-terra 
+r-mgcv 
+r-fields 
+r-nlme etc.
