@@ -205,3 +205,61 @@ plot(grid.rkgls.gam, main ="RK-GLS - GAM fits, difference, m",
      col = topo.colors(64))
 
 #-- uk
+
+#- what do we have thusfar?
+names(grid.sf)
+
+str(grid.sf$geometry)
+
+#-- 
+names(cfaq.sf)
+
+#-- 
+str(st_coordinates(grid.sf))
+
+#- variables to grid
+grid.sf$X <- st_coordinates(grid.sf)[ , "X"]
+grid.sf$Y <- st_coordinates(grid.sf)[ , "Y"]
+names(grid.sf)
+
+#- empirical variogram
+vr <- variogram(zm ~ E + N + I(E^2) + I(N^2) + I(E*N), locations = aq.sf, cutoff = 50000)
+#- plot
+plot(vr, plot.numbers = TRUE, main = "Residuals from 2nd-order OLS trend surface", xlab = "separation (m)", ylab = "semivariance (m^2)")
+
+#- variogram model 
+#(vr.m.f <- fit.variogram(vr, vgm(35, "Exp", 22000/3, 0)))
+vr.m.f <- fit.variogram(vr, vgm(psill=200, model="Mat", range=15000)#, nugget=25)
+
+#- plot old-variogram-model
+plot(vr, plot.numbers=TRUE, xlab="separation (km)", ylab="semivariance (m^2)", model=vr.m.f, main="Fitted variogram model, residuals from 2nd-order OLS trend surface")
+
+#- uk
+k.uk <- krige(zm ~ E + N + I(E^2) + I(N^2) + I(E*N), locations = aq.sf, newdata = grid1km.sf, model=vr.m.f)
+
+#- plot uk predictors
+plot(k.uk["var1.pred"], pch=15, col = rainbow(100), nbreaks=24, main="UK predictions, m")
+
+#- uk-prediction std-dev.
+k.uk$var1.sd <- sqrt(k.uk$var1.var)
+summary(k.uk)
+
+#- plot std-dev
+plot(k.uk["var1.sd"], pch=15, nbreaks=24, pal = heat.colors, main="Standard errors of UK predictions, m")
+
+#- summary uk
+summary(k.uk$var1.sd)
+
+#- summary gls-rk
+summary(kr$var1.sd)
+
+#- diff. uk and gls-rk summary
+grid.uk <- grid
+values(grid.uk) <- k.uk$var1.pred
+summary(grid.diff.uk.rkgls <- (grid.uk - grid.rkgls))
+
+#- diff. uk and gls-rk hist.
+hist(grid.diff.uk.rkgls, main = "UK - GLS-RK prediction differences", freq = FALSE, xlab = "difference, UK - GLS-RK")
+
+#- plot uk minus gls-rk diff surface
+plot(grid1km.diff.uk.rkgls, sub="UK - GLS-RK predictions", main="difference, m", xlab="East", ylab="North", col = topo.colors(64))
