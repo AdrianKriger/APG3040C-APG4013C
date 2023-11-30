@@ -1339,7 +1339,7 @@ We conclude this exercise by reading a dataset from file, executing a few more e
 The dataset we are using are [chocolate bar ratings](https://www.kaggle.com/datasets/evangower/chocolate-bar-ratings) available via the Open Database License (ODbL); intended to allow users to freely share, modify, and use while maintaining the same freedom for others. 
 
 ```{r read-csv }
-chocolateData <- read_csv("chocolate_bars.csv", show_col_types = FALSE)
+chocolateData <- read_csv("./data/chocolate_bars.csv", show_col_types = FALSE)
 class(chocolateData)
 ```
 We see our dataset became a `data.frame` via the `read_csv` function.
