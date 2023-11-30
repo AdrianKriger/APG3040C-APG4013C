@@ -72,20 +72,18 @@ You are required to insert your outputs and any comment into this document. The 
 
 #- https://bookdown.org/robinlovelace/geocompr/spatial-class.html
 
-#options(prompt="> ", continue="+ ", digits=3, width=70,  show.signif.stars=F, repr.plot.width=7, repr.plot.height=7), rm(list=ls())
+options(prompt="> ", continue="+ ", digits=3, width=70,  show.signif.stars=F, repr.plot.width=7, repr.plot.height=7), rm(list=ls())
 
 # Install necessary packages: You only need to run this part once
-##- install.packages(c("sf", "raster", "spData", "remotes", "tmap"))))
-#remotes::install_github("Nowosad/spDataLarge")
+install.packages(c("sf", "raster", "spData", "remotes", "ggplot2", "patchwork", "leaflet", "tidyverse" ))
+remotes::install_github("Nowosad/spDataLarge")
 
-#library(sp)
 library(sf)           # 'simple features' representations of spatial objects
 library(raster)       # 
 library(spData)
 library(spDataLarge)
 library(dplyr)
 library(stringr) 
-library(tmap)
 library(ggplot2)
 library(patchwork)
 library(leaflet) 
@@ -335,7 +333,7 @@ The geographic raster data model usually consists of a matrix (with rows and col
 
 The origin (or starting point) is frequently the coordinate of the lower-left corner of the matrix (some packages however use the upper left corner). The cell of one raster layer can only hold a single value. The value can be either numeric or categorical
 
-![](rast.png)
+![](./img/rast.png)
 
 Raster maps usually represent ***continuous phenomena*** such as elevation, temperature, population density or spectral data. We can also represent discrete features *(**continuous phenomena**)* such as soil or land-cover classes with the help of a raster data model. _**Take care**_, the discrete borders can become blurred, and depending on the spatial task a vector representation might be more suitable.
 
@@ -415,7 +413,7 @@ Ellipsoids are part of a wider component of a CRS: *the datum*. There are two ty
 
 ***None of this should be new nor a surprise to you. You actually know this already.***
 
-![](datum.png)
+![](./img/datum.png)
 
 Consider the **Hartebeesthoek94** datum used with the local *South African Coordinate Reference* System. In the Hartebeesthoek94 datum; the ellipsoidal surface is ***shifted*** to align with the surface at the Hartebeesthoek Observatory; west of Pretoria.
 
@@ -1057,26 +1055,11 @@ random_points = random_df |>
   st_as_sf(coords = c("x", "y"), crs = "EPSG:4326") # set coordinates and CRS
 ```
 
-```{r spatial-plot }
-
-jm0 = tm_shape(world) + tm_borders(lwd = 0.2) + tm_format("World")
-
-jm1 = jm0 +
-  tm_shape(shp = random_points, bbox = bb) +
-  tm_symbols(col = "black", shape = 4)#, lwd = 2)
-
-jm1
-```
-
 ```{r gg-spatial-plot }
 p1 <- ggplot(world) +  #ggtitle("High points in New Zealand") +
   geom_sf(color = "gray", fill = "white") +
-  geom_sf(data = random_points, color = "black", shape = 4, lwd = 3) +
-  coord_sf(datum = NA) #+
-  #theme(panel.background = element_rect(fill = "lightblue", colour = "lightblue"),
-  #      panel.border = element_rect(
-  #  fill = alpha("#2C77BF", .1), color = alpha("#2C77BF", .5), linewidth = 2))
-
+  geom_sf(data = random_points, color = "black", shape = 4, lwd = 7) +
+  coord_sf(datum = NA) 
 p1
 ```
 
@@ -1097,10 +1080,7 @@ random_joined$name_long = as.character(random_joined$name_long)
 p1 <- ggplot(world) +
   geom_sf(color = "gray", fill = "white") +
   # Map on the color aes
-  geom_sf(data = random_joined, aes(color = name_long), shape = 16) + # ,  color = "white") +
-  scale_color_manual(
-    values = c("blue", "yellow", "red", "orange", "white")
-  ) +
+  geom_sf(data = random_joined, aes(color = name_long), shape = 16) + 
   coord_sf(datum = NA)
 
 p1
@@ -1131,6 +1111,8 @@ cycle_hire_osm
 ```
 
 Plotting them shows that they are often *closely related but they do not touch*.
+
+Here we showcase the datasets with a fancy an interactive `leaftlet` plot. 
 
 ```{r interactive-cycle }
 
@@ -1169,7 +1151,7 @@ summary(lengths(sel) > 0)
 <strong> QUESTION!</strong>
 :::
 
--   **Question 14.** Why is it necessary to transform the dataset to a projected `crs`? Why can we not use the dataset with the *'wgs84'* `crs`?
+-   **Question 14.** Why is it necessary to transform the dataset to a _projected_ `crs`? Why do we not normally perform a spatial join (an `st_join`) with a _geographic_ `crs` (like wgs84)?
 
 <p class="comment">
 [ Click in this cell and write your answer here ]
