@@ -110,7 +110,7 @@ Lets start with the *absolute foundation* and recap spatial data models.
 
 The ***vector*** **data model** represents the world using *points, lines and polygons*. These have *discrete, well-defined borders*, meaning that vector datasets usually have a high level of precision (but not necessarily accuracy).
 
-![](vec-rast_2.png)
+![](./img/vec-rast_2.png)
 
 The ***raster*** **data model** divides the surface up into cells of constant size. Raster datasets are the basis of background images used in web-mapping and have been a vital source of geographic data since the origins of aerial photography and satellite-based remote sensing devices. Rasters *aggregate* spatially specific features to a given resolution, meaning that they are consistent over space and scalable (many worldwide raster datasets are available).
 
@@ -122,7 +122,7 @@ Most point geometries contain only two dimensions (a 3-dimensional CRS contains 
 
 We will introduce the point and as we advance; lines, polygons and more advanced geometry types *(multi-point, -line and -polygon)* will be explored.
 
-![](vec.png)
+![](./img/vec.png)
 
 In `R` we interogate vector data with the `sf` package; which provides a class system for geographic vector data.
 
@@ -345,7 +345,7 @@ We will explore raster data in `R` with the `raster` package. It provides an ext
 help('raster')
 ```
 
-For the illustration of raster concepts, we will use datasets from the `spDataLarge`. It consists of a few raster objects and one vector object covering an area of the Zion National Park (Utah, USA). We will start with *'srtm.tif'*. A digital elevation model of the area.
+For the illustration of raster concepts, we will use datasets from the `spDataLarge`. It consists of a few raster objects and one vector object covering an area of the [Zion National Park (Utah, USA)](https://en.wikipedia.org/wiki/Zion_National_Park). We will start with *'srtm.tif'*. A digital elevation model of the area.
 
 ```{r srtm }
 raster_filepath = system.file("raster/srtm.tif", package = "spDataLarge")
@@ -1354,7 +1354,7 @@ For example, one might want to compute the distance to the nearest coast. We mig
 
 We conclude this exercise by reading a dataset from file, executing a few more examples of attribute data operations and graphing the result.
 
-The dataset we are using is the 
+The dataset we are using are [chocolate bar ratings](https://www.kaggle.com/datasets/evangower/chocolate-bar-ratings) available via the Open Database License (ODbL); intended to allow users to freely share, modify, and use while maintaining the same freedom for others. 
 
 ```{r read-csv }
 chocolateData <- read_csv("chocolate_bars.csv", show_col_types = FALSE)
@@ -1473,6 +1473,16 @@ Finally we can save any object. Here we save the previous graph as a `.png`
 ggsave("chocolateRatingByReviewDate.png", # the name of the file where it will be save
        height=6, width=10, units="in") # the size of the plot & units of the size
 ```
+
+::: {.alert .alert-warning}
+<strong> QUESTION!</strong>
+:::
+
+-   **Question 15.** Discuss the advantages and disdvantages of open licensing within the context of Spatial Data Science. _Your answer cannot be more than 100 words_.
+
+<p class="comment">
+[ Click in this cell and write your answer here *-ans: Visibility and viewshed*]
+</p>
 
 ------------------------------------------------------------------------
 
